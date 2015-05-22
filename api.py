@@ -1,9 +1,11 @@
-import os, flask, json, dateutil.parser, time, math, requests
+import os, flask, json, dateutil.parser, time, math, requests, functools32
 
 app = flask.Flask(__name__)
 iata = json.load(open('iata.json'))
 EARTH_CIRCUMFERENCE = 24901
 FORECAST_API = 'https://api.forecast.io/forecast/fb36105e650d6436e4d6a7ebd2d97ce0'
+
+cache = {}
 
 class ResolveException(Exception): pass
 def _resolve(location):
@@ -15,6 +17,9 @@ def _resolve(location):
             return json.loads('[%s]' % location)
         except Exception:
             raise ResolveException()
+@app.route('/')
+def home():
+    return flask.render_template('home.html')
 
 @app.route('/resolve/<string:location>')
 def resolve(location):
@@ -24,13 +29,19 @@ def resolve(location):
         return flask.Response(json.dumps({'error': 'invalid location: %s' % location}), status=500, mimetype='application/json')
 
 def weather(location, time):
-    data = requests.get('%s/%s,%s,%s' % (FORECAST_API, location[0], location[1], time)).json()
+    @functools32.lru_cache(maxsize=1024)
+    def get_data(url):
+        return requests.get(url).json()
+    time_rnd = (time // 3600) * 3600
+    location_rnd = map(lambda x: round(x, 2), location)
+    url = '%s/%s,%s,%s' % (FORECAST_API, location_rnd[0], location_rnd[1], time_rnd)
+    data = get_data(url)
     ret = {
         "incomplete": False,
         "location": location,
-        "location_rnd": map(lambda x: round(x, 2), location),
+        "location_rnd": location_rnd,
         "time": time,
-        "time_rnd": (time // 3600) * 3600
+        "time_rnd": time_rnd
     }
     try: ret["time_offset"] = data['offset']
     except KeyError: ret['incomplete'] = True
