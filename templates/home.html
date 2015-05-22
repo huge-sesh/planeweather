@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script src="/static/webui.js"></script>
+    </head>
+    <body>
+        <div id="map" style="width:100%; height: 70%;"></div>
+        <div>
+            <label for="start">Start:</label>
+            <input id="start" name="start" value="LAX"></input>
+        </div>
+        <div>
+            <label for="dest">Destination:</label>
+            <input id="dest" name="dest" value="LHR"></input>
+        </div>
+        <div>
+            <label for="datetime">Datetime:</label>
+            <input type="datetime-local" id="datetime" name="datetime"></input>
+        </div>
+        <div>
+            <label for="speed">Speed:</label>
+            <input type="number" min="300" id="speed" name="speed" value="500"></input>
+        </div>
+        <div>
+            <label for="timestep">Timestep:</label>
+            <input type="number" min="1" id="timestep" name="timestep" value="2"></input>
+        </div>
+        <div>
+            <input type="submit" onclick="map()"></input>
+        </div>
+    </body>
+</html>
