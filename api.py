@@ -78,6 +78,7 @@ def forecast(src, dest, departure_datetime, speed_mph, time_step):
     distance = math.sqrt(vector[0]**2 + vector[1]**2)
     hours = distance / angular_speed
 
+    # doesn't place an extra interval at the end, since the example doesn't seem to.
     intervals = []
     for t in range(0, int(hours), time_step):
         location = [src[0] + vector[0] * t / hours, src[1] + vector[1] * t / hours]
